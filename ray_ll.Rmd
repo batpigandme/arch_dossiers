@@ -1,0 +1,58 @@
+---
+title: "Dukes! Classic Ray"
+author: "Mara Averick"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r load libs, message = FALSE}
+library(tidyverse)
+library(magick)
+library(here)
+library(magrittr)
+library(ggthemes)
+library(extrafont)
+```
+
+```{r ray terms, message = FALSE}
+ray_ll_terms <- read_csv(here("data", "ray_ll_terms.csv"))
+```
+
+Fill to match character colors from [*_Beyond the Tip: a data-driven exploration of Archer_*](https://archervisualization.herokuapp.com/) using the adjusted log likelihood values. 
+
+```{r ray ll chart}
+ray_ll_terms %>%
+  mutate(term = reorder(term, adjLL)) %>%
+  ggplot(aes(term, adjLL)) +
+  geom_bar(stat = "identity", fill = "#61FFB8") +
+  ggtitle("Ray's Most Distinctive Terms") +
+  xlab(NULL) +
+  coord_flip() +
+  theme_tufte(base_family = "Arial", base_size = 13, ticks = FALSE) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme(plot.title = element_text(size = 14, family = 'Baveuse-Regular'),
+        axis.text = element_text(size = 8, family = 'Consolas'),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_blank())
+
+ggsave(filename = here("img", "ray_ll_plot.png"), width = 5, height = 4, dpi = 300)
+```
+
+```{r ray spin}
+background <- image_read(here("img", "ray_ll_plot.png"))
+
+spin_raw <- image_read(here("img", "ray_spin_nobg.gif"))
+
+frames <- lapply(spin_raw, function(frame) {
+  image_composite(background, frame, offset = "+330+380")
+})
+
+
+animation <- image_animate(image_join(frames))
+
+
+image_write(animation, here("img", "ray_ll_spin.gif"))
+```
+
+![](http://i.imgur.com/bOzCNTZ.gif)
