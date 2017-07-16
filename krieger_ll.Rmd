@@ -1,0 +1,58 @@
+---
+title: "Scheisse: Algernop Krieger Classics"
+author: "Mara Averick"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r load libs, message = FALSE}
+library(tidyverse)
+library(magick)
+library(here)
+library(magrittr)
+library(ggthemes)
+library(extrafont)
+```
+
+```{r krieger terms, message = FALSE}
+krieger_ll_terms <- read_csv(here("data", "krieger_ll_terms.csv"))
+```
+
+Fill to match character colors from [*_Beyond the Tip: a data-driven exploration of Archer_*](https://archervisualization.herokuapp.com/) using the adjusted log likelihood values. 
+
+```{r krieger ll chart}
+krieger_ll_terms %>%
+  mutate(term = reorder(term, adjLL)) %>%
+  ggplot(aes(term, adjLL)) +
+  geom_bar(stat = "identity", fill = "#966FD6") +
+  ggtitle("Krieger's Most Distinctive Terms") +
+  xlab(NULL) +
+  coord_flip() +
+  theme_tufte(base_family = "Arial", base_size = 13, ticks = FALSE) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme(plot.title = element_text(size = 14, family = 'Baveuse-Regular'),
+        axis.text = element_text(size = 8, family = 'Consolas'),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_blank())
+
+ggsave(filename = here("img", "krieger_ll_plot.png"), width = 5, height = 4, dpi = 300)
+```
+
+```{r krieger coffe}
+background <- image_read(here("img", "krieger_ll_plot.png"))
+
+coffee_raw <- image_read(here("img", "krieger_coffee_no_bg.gif"))
+
+frames <- lapply(coffee_raw, function(frame) {
+  image_composite(background, frame, offset = "+450+430")
+})
+
+
+animation <- image_animate(image_join(frames))
+
+
+image_write(animation, here("img", "krieger_ll_coffee.gif"))
+```
+
+![](http://i.imgur.com/HoJyAEZ.gif)
