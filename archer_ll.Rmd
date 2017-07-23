@@ -1,0 +1,56 @@
+---
+title: "Danger Zone: Sterling Archer classics"
+author: "Mara Averick"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+```{r load libs, message = FALSE}
+library(tidyverse)
+library(magick)
+library(here)
+library(magrittr)
+library(ggthemes)
+library(extrafont)
+```
+
+```{r archer terms, message = FALSE}
+archer_ll_terms <- read_csv(here("data", "archer_ll_terms.csv"))
+```
+
+
+```{r archer ll chart}
+archer_ll_terms %>%
+  mutate(term = reorder(term, adjLL)) %>%
+  ggplot(aes(term, adjLL)) +
+  geom_bar(stat = "identity", fill = "#003EFF") +
+  ggtitle("Archer's Most Distinctive Terms") +
+  xlab(NULL) +
+  coord_flip() +
+  theme_tufte(base_family = "Arial", base_size = 13, ticks = FALSE) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme(plot.title = element_text(size = 14, family = 'Baveuse-Regular'),
+        axis.text = element_text(size = 8, family = 'Consolas'),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_blank())
+
+ggsave(filename = here("img", "archer_ll_plot.png"), width = 5, height = 4, dpi = 144)
+```
+
+```{r archer zerog}
+background <- image_read(here("img", "archer_ll_plot.png"))
+
+zerog_raw <- image_read(here("img", "archer_zerog_nobg.gif"))
+
+frames <- lapply(zerog_raw, function(frame) {
+  image_composite(background, frame, offset = "+280+230")
+})
+
+
+animation <- image_animate(image_join(frames))
+
+
+image_write(animation, here("img", "archer_ll_zerog.gif"))
+```
+
+![](http://i.imgur.com/kab2bSY.gif)
