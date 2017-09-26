@@ -53,4 +53,5 @@ animation <- image_animate(image_join(frames))
 image_write(animation, here("img", "cheryl_ll_blowup.gif"))
 ```
 
-![](http://i.imgur.com/Qa4Q8bV.gif)
+![](https://i.imgur.com/iqgdsCf.gif)
+
